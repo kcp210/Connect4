@@ -54,11 +54,10 @@ public class Connect4Server extends Application implements Connect4Constants{
                            player1.getOutputStream()).writeChar(PLAYER_1);
 
                    // determine if player wants one or two person game
-//                   DataInputStream fromP1 = new DataInputStream(player1.getInputStream());
-//                   int numPlayers = fromP1.readInt();
-//                   System.out.println(numPlayers);
+                   int numPlayers = new DataInputStream(player1.getInputStream()).readInt();
+                   System.out.println(numPlayers);
 
-//                   if (numPlayers == TWO_PLAYER_GAME) {
+                   if (numPlayers == TWO_PLAYER_GAME) {
 
                        // Connect to player 2
                        Socket player2 = serverSocket.accept();
@@ -82,13 +81,13 @@ public class Connect4Server extends Application implements Connect4Constants{
                        // Launch new thread for two player GUI session
                        new Thread(new HandleGUISession(player1, player2)).start();
                    }
-//                   else { //one player game
-//                       Platform.runLater(() ->
-//                               serverLog.appendText(new Date() +
-//                                       ": Start a thread for 1 player session " + sessionNum++ + '\n'));
-//                       new Thread(new HandleGUISession(player1)).start();
-//                   }
-//               }
+                   else { //one player game
+                       Platform.runLater(() ->
+                               serverLog.appendText(new Date() +
+                                       ": Start a thread for 1 player session " + sessionNum++ + '\n'));
+                       new Thread(new HandleGUISession(player1)).start();
+                   }
+               }
            } catch (IOException ex) {
                ex.printStackTrace();
            }
@@ -271,6 +270,8 @@ public class Connect4Server extends Application implements Connect4Constants{
                         }
 
                         takeComputerTurn();
+
+                        status = checkForWin();
 
                         if (status == P2_WINNER) {
                             toP1.writeInt(P2_WINNER);

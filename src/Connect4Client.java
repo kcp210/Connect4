@@ -147,21 +147,28 @@ public class Connect4Client extends Application implements Connect4Constants {
                        }
                    });
 
-//                   if (twoPlayerGame) {
-//                       toServer.writeChar(TWO_PLAYER_GAME);
-//                   }
-//                   else {
-//                       toServer.writeChar(ONE_PLAYER_GAME);
-//                   }
+                   if (twoPlayerGame) {
+                       toServer.writeInt(TWO_PLAYER_GAME);
+                   }
+                   else {
+                       toServer.writeInt(ONE_PLAYER_GAME);
+                       System.out.println("sent");
+                   }
 
                    // Receive startup notification from the server
                    fromServer.readInt(); // Whatever read is ignored
 
-                   // The other player has joined
-                   Platform.runLater(() ->
-                           prompt.setText("Player 2 has joined. Please click a " +
-                                   "column to make a move"));
-
+                   if (twoPlayerGame) {
+                       // The other player has joined
+                       Platform.runLater(() ->
+                               prompt.setText("Player 2 has joined. Please click a " +
+                                       "column to make a move"));
+                   }
+                   else {
+                       Platform.runLater(() ->
+                               prompt.setText("It is your turn. Please click a " +
+                                       "column to make a move"));
+                   }
                    // It is my turn
                    myTurn = true;
                }
