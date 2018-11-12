@@ -1,3 +1,12 @@
+/**
+ * @version 1.0
+ * @author Kaysi Pilcher
+ *
+ * The Connect4Server class is the server side to a Connect4 game.
+ * 1 and 2 Player game play is supported with a Graphic User Interface
+ *
+ */
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.Scene;
@@ -15,8 +24,13 @@ import java.util.Date;
 
 public class Connect4Server extends Application implements Connect4Constants{
 
+    // keeps track of how many sessions are running
     private static int sessionNum = 1;
 
+    /**
+     * Start method for server
+     * @param primaryStage stage for server
+     */
     public void start(Stage primaryStage) {
         TextArea serverLog = new TextArea();
 
@@ -95,8 +109,10 @@ public class Connect4Server extends Application implements Connect4Constants{
     }
 
 
-
-    public class HandleGUISession implements Runnable, Connect4Constants {
+    /**
+     * Nested Inner Task class to manage a particular Connect4 game session
+     */
+    private class HandleGUISession implements Runnable, Connect4Constants {
 
         private Socket player1;
         private Socket player2;
@@ -121,7 +137,7 @@ public class Connect4Server extends Application implements Connect4Constants{
          * @param p1 client socket for player 1
          * @param p2 client socket for player 2
          */
-        HandleGUISession(Socket p1, Socket p2) {
+        private HandleGUISession(Socket p1, Socket p2) {
             // assign sockets
             player1 = p1;
             player2 = p2;
@@ -139,7 +155,12 @@ public class Connect4Server extends Application implements Connect4Constants{
             winner = BLANK;
         }
 
-        HandleGUISession(Socket p1) {
+        /**
+         * Constructor for a thread to handle the GUI Connect4 game
+         * with one player
+         * @param p1 client socket for player 1
+         */
+        private HandleGUISession(Socket p1) {
             player1 = p1;
             twoPlayerGame = false;
             board = new char[6][7];
@@ -152,6 +173,9 @@ public class Connect4Server extends Application implements Connect4Constants{
             winner = BLANK;
         }
 
+        /**
+         * The control method for the task
+         */
         @Override
         public void run() {
 
@@ -236,6 +260,14 @@ public class Connect4Server extends Application implements Connect4Constants{
 
         }
 
+        /**
+         * Method that sends the status of a one player game to the player. The method
+         * is called after each turn
+         * @param status status of game
+         * @param winner which player just went and may have won
+         * @return true if the game is over due to tie or win
+         * @throws IOException due to server communication
+         */
         private boolean sendStatusCompPlay(int status, int winner) throws IOException {
             if (status == winner) {
                 toP1.writeInt(winner);
@@ -252,6 +284,14 @@ public class Connect4Server extends Application implements Connect4Constants{
             return false;
         }
 
+        /**
+         * Method that sends the status of a two player game to the players. The method
+         * is called after each turn.
+         * @param status status of game
+         * @param winner which player just went and may have won
+         * @return true if game is over dur to tie or win
+         * @throws IOException due to server communication
+         */
         private boolean sendStatus2Player(int status, int winner) throws IOException {
             if (status == winner) {
                 toP1.writeInt(winner);
@@ -433,7 +473,4 @@ public class Connect4Server extends Application implements Connect4Constants{
             return TIE;
         }
     }
-
-
-
 }

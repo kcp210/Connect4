@@ -1,3 +1,12 @@
+/**
+ * @version 1.0
+ * @author Kaysi Pilcher
+ *
+ * The Connect4Constants interface keeps track of what certain messages mean
+ * between the Connect4Server and the Connect4Client
+ *
+ */
+
 public interface Connect4Constants {
 
     int P1_WINNER = 1;

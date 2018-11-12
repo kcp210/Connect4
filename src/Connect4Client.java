@@ -1,3 +1,12 @@
+/**
+ * @version 1.0
+ * @author Kaysi Pilcher
+ *
+ * The Connect4Client class is the client side to a Connect4 game.
+ * 1 and 2 Player game play is supported with a Graphic User Interface
+ *
+ */
+
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
@@ -29,21 +38,19 @@ public class Connect4Client extends Application implements Connect4Constants {
     private char myToken;
     private char otherToken;
     private boolean myTurn;
-
     private int selectedColumn;
-
     private DataInputStream fromServer;
     private DataOutputStream toServer;
-
-    // Continue to play?
     private boolean continueToPlay = true;
-
     // Wait for the player to mark a cell
     private boolean waiting = true;
-
     // Host name or ip
     private String host = "localhost";
 
+    /**
+     * Main entry point
+     * @param args command line parameters
+     */
     public static void main(String args[]) {
         //TODO: add option for UI or Console
         launch(args);
@@ -52,7 +59,7 @@ public class Connect4Client extends Application implements Connect4Constants {
     /**
      * The start method initializes all components of the page and
      * starts the application
-     * @param primaryStage
+     * @param primaryStage stage for the client GUI
      */
     @Override
     public void start(Stage primaryStage) {
@@ -99,6 +106,9 @@ public class Connect4Client extends Application implements Connect4Constants {
 
     }
 
+    /**
+     * Method that asks the user if they want to play a 1 or 2 player game
+     */
     private void pickNumPlayers() {
         String decision;
         System.out.println("Enter 'P' if you want to play against another player; " +
@@ -116,6 +126,9 @@ public class Connect4Client extends Application implements Connect4Constants {
         twoPlayerGame = !decision.equals("C");
     }
 
+    /**
+     * Method that conencts the client to the server and facilitates game play
+     */
     private void connectToServer() {
         try {
             Socket socket = new Socket(host, 8000);
@@ -194,7 +207,10 @@ public class Connect4Client extends Application implements Connect4Constants {
         }).start();
     }
 
-    /** Wait for the player to mark a cell */
+    /**
+     * Waits for the player to click on a column
+     * @throws InterruptedException due to Thread class
+     */
     private void waitForPlayerAction() throws InterruptedException {
         while (waiting) {
             Thread.sleep(100);
@@ -234,6 +250,9 @@ public class Connect4Client extends Application implements Connect4Constants {
         myTurn = false;
     }
 
+    /**
+     * Receives status from server
+     */
     private void receiveInfoFromServer(){
         try {
             int status = fromServer.readInt();
@@ -303,6 +322,9 @@ public class Connect4Client extends Application implements Connect4Constants {
         return null;
     }
 
+    /**
+     * Nested inner class for each gamespace on the Connect4 board
+     */
     private class GameSpace extends Pane {
 
         // value of the gamespace
