@@ -1,8 +1,10 @@
+package core;
+
 /**
  * @version 1.0
  * @author Kaysi Pilcher
  *
- * The Connect4Server class is the server side to a Connect4 game.
+ * The core.Connect4Server class is the server side to a Connect4 game.
  * 1 and 2 Player game play is supported with a Graphic User Interface
  *
  */

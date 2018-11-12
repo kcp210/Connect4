@@ -1,9 +1,11 @@
+package core;
+
 /**
  * @version 1.0
  * @author Kaysi Pilcher
  *
- * The Connect4Constants interface keeps track of what certain messages mean
- * between the Connect4Server and the Connect4Client
+ * The core.Connect4Constants interface keeps track of what certain messages mean
+ * between the core.Connect4Server and the core.Connect4Client
  *
  */
 
