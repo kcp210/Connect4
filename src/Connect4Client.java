@@ -43,7 +43,6 @@ public class Connect4Client extends Application implements Connect4Constants {
 
     // Host name or ip
     private String host = "localhost";
-    private int port = 8000;
 
     public static void main(String args[]) {
         //TODO: add option for UI or Console
@@ -56,7 +55,7 @@ public class Connect4Client extends Application implements Connect4Constants {
      * @param primaryStage
      */
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
         pickNumPlayers();
         // add correct styling to each gamespace in board
         grid = new GridPane();
@@ -114,11 +113,7 @@ public class Connect4Client extends Application implements Connect4Constants {
             decision = scan.nextLine();
         }
 
-        if (decision.equals("C")) {
-            twoPlayerGame = false;
-        } else { // Play another player
-            twoPlayerGame = true;
-        }
+        twoPlayerGame = !decision.equals("C");
     }
 
     private void connectToServer() {
@@ -210,16 +205,14 @@ public class Connect4Client extends Application implements Connect4Constants {
 
     /**
      * Sends move to server
-     * @throws IOException
+     * @throws IOException from server communication
      */
     private void sendMove() throws IOException {
         toServer.writeInt(selectedColumn);
         int valid = fromServer.readInt();
 
         if (valid == INVALID_TURN) {
-            Platform.runLater(() -> {
-                prompt.setText("Invalid Move - Please try again.");
-            });
+            Platform.runLater(() -> prompt.setText("Invalid Move - Please try again."));
             waiting = true; //new
             try {
                 waitForPlayerAction();
@@ -282,7 +275,7 @@ public class Connect4Client extends Application implements Connect4Constants {
 
     /**
      * Receive other players move
-     * @throws IOException
+     * @throws IOException due to server communication
      */
     private void receiveMove(char token) throws IOException {
         int row = fromServer.readInt();
@@ -310,7 +303,7 @@ public class Connect4Client extends Application implements Connect4Constants {
         return null;
     }
 
-    public class GameSpace extends Pane {
+    private class GameSpace extends Pane {
 
         // value of the gamespace
         private char value;
@@ -319,7 +312,7 @@ public class Connect4Client extends Application implements Connect4Constants {
         /**
          * Constructor for a GameSpace
          */
-        public GameSpace(int col) {
+        private GameSpace(int col) {
             value = BLANK;
             // adding 1 accounts for takeTurn method
             column = col + 1;
@@ -333,7 +326,7 @@ public class Connect4Client extends Application implements Connect4Constants {
          * Setter for value of GameSpace
          * @param v new value
          */
-        public void setValue(char v) {
+        private void setValue(char v) {
             //set new value
             value = v;
 
@@ -376,12 +369,5 @@ public class Connect4Client extends Application implements Connect4Constants {
             }
         }
 
-        /**
-         * Checks for a win when playing against the computer
-         * @param gameOver
-         */
-        private void checkForWinPlayAgainstComputer(int gameOver) {
-
-        }
     }
 }

@@ -101,10 +101,10 @@ public class Connect4Server extends Application implements Connect4Constants{
         private Socket player1;
         private Socket player2;
 
-        private DataInputStream fromPlayer1;
-        private DataOutputStream toPlayer1;
-        private DataInputStream fromPlayer2;
-        private DataOutputStream toPlayer2;
+        private DataInputStream fromP1;
+        private DataOutputStream toP1;
+        private DataInputStream fromP2;
+        private DataOutputStream toP2;
 
         private char[][] board;
         private boolean player1Turn;
@@ -157,10 +157,10 @@ public class Connect4Server extends Application implements Connect4Constants{
 
             try {
                 if (twoPlayerGame) {
-                    DataInputStream fromP1 = new DataInputStream(player1.getInputStream());
-                    DataOutputStream toP1 = new DataOutputStream(player1.getOutputStream());
-                    DataInputStream fromP2 = new DataInputStream(player2.getInputStream());
-                    DataOutputStream toP2 = new DataOutputStream(player2.getOutputStream());
+                    fromP1 = new DataInputStream(player1.getInputStream());
+                    toP1 = new DataOutputStream(player1.getOutputStream());
+                    fromP2 = new DataInputStream(player2.getInputStream());
+                    toP2 = new DataOutputStream(player2.getOutputStream());
                     int column;
 
                     // give player 1 ok to start game
@@ -180,24 +180,7 @@ public class Connect4Server extends Application implements Connect4Constants{
                         // determine if p1 made winning move, else next player takes turn
                         int status = checkForWin();
 
-                        if (status == P1_WINNER) {
-                            toP1.writeInt(P1_WINNER);
-                            toP2.writeInt(P1_WINNER);
-                            sendMove(toP1);
-                            sendMove(toP2);
-                            break; //game ends
-                        } else if (status == TIE) {
-                            toP1.writeInt(TIE);
-                            toP2.writeInt(TIE);
-                            sendMove(toP1);
-                            sendMove(toP2);
-                            break; //game over
-                        } else if (status == CONTINUE) {
-                            toP2.writeInt(CONTINUE);
-                            toP1.writeInt(CONTINUE); //new
-                            sendMove(toP1);
-                            sendMove(toP2);
-                        }
+                        if (sendStatus2Player(status, P1_WINNER)) break; //game over
 
                         // receive move from p2
 
@@ -213,31 +196,13 @@ public class Connect4Server extends Application implements Connect4Constants{
                         // check if p2 made winning move
                         status = checkForWin();
 
-                        if (status == P2_WINNER) {
-                            toP1.writeInt(P2_WINNER);
-                            toP2.writeInt(P2_WINNER);
-                            sendMove(toP2);
-                            sendMove(toP1);
-                            break; //game over so end loop
-                        } else if (status == TIE) {
-                            toP1.writeInt(TIE);
-                            toP2.writeInt(TIE);
-                            sendMove(toP2);
-                            sendMove(toP1);
-                            break; //game over
-                        } else if (status == CONTINUE) {
-                            // send move to p1 and continue
-                            toP1.writeInt(CONTINUE);
-                            toP2.writeInt(CONTINUE); //new
-                            sendMove(toP2);
-                            sendMove(toP1);
-                        }
+                        if (sendStatus2Player(status, P2_WINNER)) break;
                     }
                 }
                 else { //one player game
 
-                    DataInputStream fromP1 = new DataInputStream(player1.getInputStream());
-                    DataOutputStream toP1 = new DataOutputStream(player1.getOutputStream());
+                    fromP1 = new DataInputStream(player1.getInputStream());
+                    toP1 = new DataOutputStream(player1.getOutputStream());
                     int column;
 
                     // give player 1 ok to start game
@@ -256,41 +221,57 @@ public class Connect4Server extends Application implements Connect4Constants{
                         // determine if p1 made winning move, else next player takes turn
                         int status = checkForWin();
 
-                        if (status == P1_WINNER) {
-                            toP1.writeInt(P1_WINNER);
-                            sendMove(toP1);
-                            break; //game ends
-                        } else if (status == TIE) {
-                            toP1.writeInt(TIE);
-                            sendMove(toP1);
-                            break; //game over
-                        } else if (status == CONTINUE) {
-                            toP1.writeInt(CONTINUE); //new
-                            sendMove(toP1);
-                        }
+                        if (sendStatusCompPlay(status, P1_WINNER)) break; //game over
 
                         takeComputerTurn();
 
                         status = checkForWin();
 
-                        if (status == P2_WINNER) {
-                            toP1.writeInt(P2_WINNER);
-                            sendMove(toP1);
-                            break; //game ends
-                        } else if (status == TIE) {
-                            toP1.writeInt(TIE);
-                            sendMove(toP1);
-                            break; //game over
-                        } else if (status == CONTINUE) {
-                            toP1.writeInt(CONTINUE); //new
-                            sendMove(toP1);
-                        }
+                        if (sendStatusCompPlay(status, P2_WINNER)) break;
                     }
                 }
             } catch (IOException ex) {
                 ex.printStackTrace();
             }
 
+        }
+
+        private boolean sendStatusCompPlay(int status, int winner) throws IOException {
+            if (status == winner) {
+                toP1.writeInt(winner);
+                sendMove(toP1);
+                return true;
+            } else if (status == TIE) {
+                toP1.writeInt(TIE);
+                sendMove(toP1);
+                return true;
+            } else if (status == CONTINUE) {
+                toP1.writeInt(CONTINUE); //new
+                sendMove(toP1);
+            }
+            return false;
+        }
+
+        private boolean sendStatus2Player(int status, int winner) throws IOException {
+            if (status == winner) {
+                toP1.writeInt(winner);
+                toP2.writeInt(winner);
+                sendMove(toP1);
+                sendMove(toP2);
+                return true;
+            } else if (status == TIE) {
+                toP1.writeInt(TIE);
+                toP2.writeInt(TIE);
+                sendMove(toP1);
+                sendMove(toP2);
+                return true;
+            } else if (status == CONTINUE) {
+                toP2.writeInt(CONTINUE);
+                toP1.writeInt(CONTINUE); //new
+                sendMove(toP1);
+                sendMove(toP2);
+            }
+            return false;
         }
 
         /**
